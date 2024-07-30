@@ -22,8 +22,8 @@ func main() {
 	http.HandleFunc("/joke", getJoke)
 	http.HandleFunc("/explain", explainJoke)
 
-	fmt.Println("Server is running on http://localhost:8080")
-	log.Fatal(http.ListenAndServe(":8080", nil))
+	fmt.Println("Server is running on http://0.0.0.0:8080")
+	log.Fatal(http.ListenAndServe("0.0.0.0:8080", nil))
 }
 
 func serveHTML(w http.ResponseWriter, r *http.Request) {

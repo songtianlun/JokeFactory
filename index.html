@@ -217,16 +217,14 @@
             text-decoration: underline;
         }
 
-        .ad-space {
-            height: 100px;
-            background-color: #ffd700;
+        .ad-container {
             margin: 20px 0;
             display: flex;
             justify-content: center;
             align-items: center;
-            border-radius: 10px;
-            transition: background-color 0.3s;
             width: 100%;
+            min-height: 100px; /* 设置最小高度以确保广告有足够的空间 */
+            overflow: hidden; /* 防止广告溢出容器 */
         }
 
         /* 暗黑模式样式 */
@@ -282,6 +280,9 @@
         }
     </style>
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script defer data-domain="jokes.skybyte.me" src="https://plausible.skybyte.me/js/script.js"></script>
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7296634171837358"
+            crossorigin="anonymous"></script>
 </head>
 <body>
 
@@ -390,10 +391,21 @@
 
         // 检查是否需要添加广告
         if (index !== 0 && (index + 1) % 3 === 0) {
-            const adSpace = document.createElement('div');
-            adSpace.className = 'ad-space';
-            adSpace.textContent = languageSelect.value === 'en' ? 'Advertisement Space' : '广告位';
-            chatBox.appendChild(adSpace);
+            const adContainer = document.createElement('div');
+            adContainer.className = 'ad-container';
+
+            const adInsElement = document.createElement('ins');
+            adInsElement.className = 'adsbygoogle';
+            adInsElement.style.display = 'block';
+            adInsElement.dataset.adClient = 'ca-pub-7296634171837358';
+            adInsElement.dataset.adSlot = '4032783461';
+            adInsElement.dataset.adFormat = 'auto';
+            adInsElement.dataset.fullWidthResponsive = 'true';
+
+            adContainer.appendChild(adInsElement);
+            chatBox.appendChild(adContainer);
+
+            (adsbygoogle = window.adsbygoogle || []).push({});
         }
 
         // 如果是最新的笑话，滚动到底部
