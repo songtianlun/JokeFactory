@@ -96,9 +96,9 @@ func explainJokeLogic(joke Joke) string {
 
 	var prompt string
 	if joke.Language == "zh" {
-		prompt = fmt.Sprintf("请用中文解释为什么这个笑话很有趣:\n%s", joke.Content)
+		prompt = fmt.Sprintf("请用中文解释为什么这个笑话很有趣，并使用 markdown 格式来组织你的回答:\n%s", joke.Content)
 	} else {
-		prompt = fmt.Sprintf("Explain in English why this joke is funny:\n%s", joke.Content)
+		prompt = fmt.Sprintf("Explain in English why this joke is funny, and use markdown format to organize your answer:\n%s", joke.Content)
 	}
 
 	resp, err := client.CreateChatCompletion(
