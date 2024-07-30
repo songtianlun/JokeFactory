@@ -66,18 +66,14 @@
             flex: 1;
             display: flex;
             flex-direction: column;
-            padding: 20px;
-            box-sizing: border-box;
+            overflow: hidden;
         }
 
         .chat-box {
             flex: 1;
             overflow-y: auto;
-            border: 1px solid #ddd;
-            border-radius: 10px;
-            padding: 10px;
-            margin-bottom: 20px;
-            transition: border-color 0.3s;
+            padding: 20px;
+            padding-bottom: 80px; /* 为按钮留出空间 */
         }
 
         .joke-container {
@@ -139,85 +135,6 @@
             border-top: 1px solid rgba(0, 0, 0, 0.1);
         }
 
-        .ad-space {
-            height: 100px;
-            background-color: #ffd700;
-            margin: 20px 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            border-radius: 10px;
-            transition: background-color 0.3s;
-            width: 100%;
-        }
-
-        .button-container {
-            display: flex;
-            justify-content: center;
-        }
-
-        button {
-            padding: 15px 30px;
-            font-size: 18px;
-            border: none;
-            border-radius: 25px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        #tellJoke {
-            background-color: #4CAF50;
-            color: white;
-        }
-
-        button:hover {
-            opacity: 0.8;
-            transform: translateY(-2px);
-        }
-
-        .dark-mode {
-            background-color: #333;
-            color: #f0f0f0;
-        }
-
-        .dark-mode .header {
-            background-color: #1a3e59;
-        }
-
-        .dark-mode .chat-box {
-            border-color: #555;
-        }
-
-        .dark-mode .joke-content {
-            background-color: #1a3e59;
-        }
-
-        .dark-mode .joke-content::before {
-            border-right-color: #1a3e59;
-        }
-
-        .dark-mode .explain-btn {
-            background-color: #0d47a1;
-        }
-
-        .dark-mode .explanation {
-            border-top-color: rgba(255, 255, 255, 0.1);
-        }
-
-        .dark-mode .ad-space {
-            background-color: #4a4a00;
-        }
-
-        .dark-mode button {
-            background-color: #555;
-        }
-
-        .explanation {
-            margin-top: 10px;
-            padding-top: 10px;
-            border-top: 1px solid rgba(0, 0, 0, 0.1);
-        }
-
         .explanation h1, .explanation h2, .explanation h3, .explanation h4, .explanation h5, .explanation h6 {
             margin-top: 10px;
             margin-bottom: 5px;
@@ -262,6 +179,70 @@
             text-decoration: underline;
         }
 
+        .ad-space {
+            height: 100px;
+            background-color: #ffd700;
+            margin: 20px 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border-radius: 10px;
+            transition: background-color 0.3s;
+            width: 100%;
+        }
+
+        .button-container {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            padding: 10px;
+            background-color: inherit;
+            text-align: center;
+            z-index: 1000;
+        }
+
+        #tellJoke {
+            background-color: #4CAF50;
+            color: white;
+            padding: 15px 30px;
+            font-size: 18px;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        #tellJoke:hover {
+            opacity: 0.8;
+            transform: translateY(-2px);
+        }
+
+        .dark-mode {
+            background-color: #333;
+            color: #f0f0f0;
+        }
+
+        .dark-mode .header {
+            background-color: #1a3e59;
+        }
+
+        .dark-mode .joke-content {
+            background-color: #1a3e59;
+        }
+
+        .dark-mode .joke-content::before {
+            border-right-color: #1a3e59;
+        }
+
+        .dark-mode .explain-btn {
+            background-color: #0d47a1;
+        }
+
+        .dark-mode .explanation {
+            border-top-color: rgba(255, 255, 255, 0.1);
+        }
+
         .dark-mode .explanation code, .dark-mode .explanation pre {
             background-color: #2c2c2c;
         }
@@ -273,6 +254,14 @@
 
         .dark-mode .explanation a {
             color: #66b3ff;
+        }
+
+        .dark-mode .ad-space {
+            background-color: #4a4a00;
+        }
+
+        .dark-mode #tellJoke {
+            background-color: #388E3C;
         }
     </style>
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
@@ -290,9 +279,9 @@
 </div>
 <div class="container">
     <div class="chat-box" id="chatBox"></div>
-    <div class="button-container">
-        <button id="tellJoke">讲个笑话</button>
-    </div>
+</div>
+<div class="button-container">
+    <button id="tellJoke">讲个笑话</button>
 </div>
 <script>
     // JavaScript 代码将在这里
@@ -303,6 +292,11 @@
     const title = document.getElementById('title');
 
     let jokes = JSON.parse(localStorage.getItem('jokes')) || [];
+
+    function scrollToBottom() {
+        const chatBox = document.getElementById('chatBox');
+        chatBox.scrollTop = chatBox.scrollHeight - chatBox.clientHeight;
+    }
 
     function setLanguage(lang) {
         const translations = {
@@ -346,7 +340,7 @@
 
         const jokeAvatar = document.createElement('div');
         jokeAvatar.className = 'joke-avatar';
-        jokeAvatar.textContent = jokeEmojis[Math.floor(Math.random() * jokeEmojis.length)]; // 随机选择 emoji
+        jokeAvatar.textContent = jokeEmojis[Math.floor(Math.random() * jokeEmojis.length)];
         jokeContainer.appendChild(jokeAvatar);
 
         const jokeContent = document.createElement('div');
@@ -367,15 +361,18 @@
 
         chatBox.appendChild(jokeContainer);
 
-        // 每隔三个笑话添加一个广告位
-        if ((index + 1) % 3 === 0) {
+        // 只在非最新笑话后面添加广告位
+        if (index !== 0 && (index + 1) % 3 === 0) {
             const adSpace = document.createElement('div');
             adSpace.className = 'ad-space';
             adSpace.textContent = languageSelect.value === 'en' ? 'Advertisement Space' : '广告位';
             chatBox.appendChild(adSpace);
         }
 
-        chatBox.scrollTop = chatBox.scrollHeight;
+        // 如果是最新的笑话，滚动到底部
+        if (index === 0) {
+            scrollToBottom();
+        }
     }
 
     function addExplanationToChat(explanation, jokeContainer, jokeIndex) {
@@ -386,7 +383,11 @@
         explanationElement.innerHTML = marked.parse(explanation);
 
         jokeContainer.querySelector('.joke-content').appendChild(explanationElement);
-        chatBox.scrollTop = chatBox.scrollHeight;
+
+        // 如果是最新的笑话，滚动到底部
+        if (jokeIndex === 0) {
+            scrollToBottom();
+        }
 
         // 保存解释到对应的笑话对象中
         if (jokes[jokeIndex]) {
@@ -395,7 +396,6 @@
             localStorage.setItem('jokes', JSON.stringify(jokes));
         }
     }
-
 
     tellJokeBtn.addEventListener('click', async () => {
         const lang = languageSelect.value;
@@ -411,9 +411,10 @@
             }
             localStorage.setItem('jokes', JSON.stringify(jokes));
 
-            // 清空聊天框并重新添加所有笑话
-            chatBox.innerHTML = '';
-            jokes.forEach((joke, index) => addJokeToChat(joke, index));
+            // 只添加新笑话，而不是重新渲染所有笑话
+            addJokeToChat(joke, 0);
+            // 滚动到底部
+            scrollToBottom();
         } catch (error) {
             console.error('Error:', error);
         } finally {
@@ -452,6 +453,7 @@
         }
     }
 
+
     function init() {
         const userLang = navigator.language || navigator.userLanguage;
         languageSelect.value = userLang.startsWith('zh') ? 'zh' : 'en';
@@ -467,12 +469,16 @@
         jokes.forEach((joke, index) => {
             addJokeToChat(joke, index);
             if (joke.explanation) {
-                const jokeContainer = chatBox.children[index * 2]; // 因为每个笑话后面都有一个广告位
+                const jokeContainers = chatBox.querySelectorAll('.joke-container');
+                const jokeContainer = jokeContainers[jokeContainers.length - 1];
                 addExplanationToChat(joke.explanation, jokeContainer, index);
             }
         });
-    }
 
+        // 初始化完成后滚动到底部
+        scrollToBottom();
+    }
+    window.addEventListener('load', scrollToBottom);
     init();
 </script>
 </body>
