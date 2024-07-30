@@ -5,13 +5,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>笑话制造工厂</title>
     <style>
-        body, html {
+        html, body {
             height: 100%;
             margin: 0;
             font-family: 'Arial', sans-serif;
+        }
+
+        .page-container {
             display: flex;
             flex-direction: column;
-            transition: background-color 0.3s, color 0.3s;
+            height: 100vh;
         }
 
         .header {
@@ -62,10 +65,11 @@
             background-color: rgba(255, 255, 255, 0.1);
         }
 
-        .container {
+        .chat-area {
             flex: 1;
             display: flex;
             flex-direction: column;
+            position: relative;
             overflow: hidden;
         }
 
@@ -74,6 +78,40 @@
             overflow-y: auto;
             padding: 20px;
             padding-bottom: 80px; /* 为按钮留出空间 */
+        }
+
+        .button-container {
+            position: absolute;
+            bottom: 20px;
+            left: 0;
+            right: 0;
+            text-align: center;
+            pointer-events: none; /* 使容器不阻挡点击事件 */
+        }
+
+        #tellJoke {
+            background-color: #4CAF50;
+            color: white;
+            padding: 15px 30px;
+            font-size: 18px;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            pointer-events: auto; /* 使按钮可以接收点击事件 */
+        }
+
+        #tellJoke:hover {
+            opacity: 0.8;
+            transform: translateY(-2px);
+        }
+
+        .footer {
+            background-color: #f5f5f5;
+            text-align: center;
+            padding: 10px;
+            font-size: 12px;
+            color: #666;
         }
 
         .joke-container {
@@ -191,33 +229,7 @@
             width: 100%;
         }
 
-        .button-container {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            padding: 10px;
-            background-color: inherit;
-            text-align: center;
-            z-index: 1000;
-        }
-
-        #tellJoke {
-            background-color: #4CAF50;
-            color: white;
-            padding: 15px 30px;
-            font-size: 18px;
-            border: none;
-            border-radius: 25px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        #tellJoke:hover {
-            opacity: 0.8;
-            transform: translateY(-2px);
-        }
-
+        /* 暗黑模式样式 */
         .dark-mode {
             background-color: #333;
             color: #f0f0f0;
@@ -263,26 +275,38 @@
         .dark-mode #tellJoke {
             background-color: #388E3C;
         }
+
+        .dark-mode .footer {
+            background-color: #222;
+            color: #999;
+        }
     </style>
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 </head>
 <body>
-<div class="header">
-    <h1 id="title">笑话制造工厂</h1>
-    <div class="controls">
-        <select id="language">
-            <option value="en">English</option>
-            <option value="zh">中文</option>
-        </select>
-        <button id="themeToggle" class="theme-toggle">🌞</button>
-    </div>
+
+<div class="page-container">
+    <header class="header">
+        <h1 id="title">笑话制造工厂</h1>
+        <div class="controls">
+            <select id="language">
+                <option value="en">English</option>
+                <option value="zh">中文</option>
+            </select>
+            <button id="themeToggle" class="theme-toggle">🌞</button>
+        </div>
+    </header>
+    <main class="chat-area">
+        <div class="chat-box" id="chatBox"></div>
+        <div class="button-container">
+            <button id="tellJoke">讲个笑话</button>
+        </div>
+    </main>
+    <footer class="footer" id="footer">
+        <p>© 2024 笑话制造工厂. All rights reserved.</p>
+    </footer>
 </div>
-<div class="container">
-    <div class="chat-box" id="chatBox"></div>
-</div>
-<div class="button-container">
-    <button id="tellJoke">讲个笑话</button>
-</div>
+
 <script>
     // JavaScript 代码将在这里
     const languageSelect = document.getElementById('language');
@@ -293,7 +317,11 @@
 
     let jokes = JSON.parse(localStorage.getItem('jokes')) || [];
 
-    function scrollToBottom() {
+    function saveJokesToLocalStorage() {
+        localStorage.setItem('jokes', JSON.stringify(jokes.slice(0, 20)));
+    }
+
+    function scrollChatToBottom() {
         const chatBox = document.getElementById('chatBox');
         chatBox.scrollTop = chatBox.scrollHeight - chatBox.clientHeight;
     }
@@ -333,7 +361,6 @@
     });
 
     const jokeEmojis = ['🤡', '😂', '🤪', '😆', '🥳', '😎', '🤓', '🤠', '🤗', '😏'];
-
     function addJokeToChat(joke, index) {
         const jokeContainer = document.createElement('div');
         jokeContainer.className = 'joke-container';
@@ -361,7 +388,7 @@
 
         chatBox.appendChild(jokeContainer);
 
-        // 只在非最新笑话后面添加广告位
+        // 检查是否需要添加广告
         if (index !== 0 && (index + 1) % 3 === 0) {
             const adSpace = document.createElement('div');
             adSpace.className = 'ad-space';
@@ -371,7 +398,12 @@
 
         // 如果是最新的笑话，滚动到底部
         if (index === 0) {
-            scrollToBottom();
+            jokes.unshift(joke);
+            if (jokes.length > 20) {
+                jokes.pop();
+            }
+            saveJokesToLocalStorage();
+            setTimeout(scrollChatToBottom, 100);
         }
     }
 
@@ -386,14 +418,13 @@
 
         // 如果是最新的笑话，滚动到底部
         if (jokeIndex === 0) {
-            scrollToBottom();
+            setTimeout(scrollChatToBottom, 100);
         }
 
         // 保存解释到对应的笑话对象中
         if (jokes[jokeIndex]) {
             jokes[jokeIndex].explanation = explanation;
-            // 更新 localStorage
-            localStorage.setItem('jokes', JSON.stringify(jokes));
+            saveJokesToLocalStorage();
         }
     }
 
@@ -405,16 +436,27 @@
         try {
             const response = await fetch(`/joke?lang=${lang}`);
             const joke = await response.json();
+
+            // 检查是否需要为之前的最新笑话添加广告
+            if (jokes.length > 0 && jokes.length % 3 === 0) {
+                const lastJokeContainer = chatBox.querySelector('.joke-container');
+                if (lastJokeContainer) {
+                    const adSpace = document.createElement('div');
+                    adSpace.className = 'ad-space';
+                    adSpace.textContent = lang === 'en' ? 'Advertisement Space' : '广告位';
+                    lastJokeContainer.after(adSpace);
+                }
+            }
+
             jokes.unshift(joke);
             if (jokes.length > 20) {
-                jokes = jokes.slice(0, 20);  // 只保留最新的20个笑话
+                jokes = jokes.slice(0, 20);
             }
             localStorage.setItem('jokes', JSON.stringify(jokes));
 
-            // 只添加新笑话，而不是重新渲染所有笑话
+            // 添加新笑话
             addJokeToChat(joke, 0);
-            // 滚动到底部
-            scrollToBottom();
+
         } catch (error) {
             console.error('Error:', error);
         } finally {
@@ -474,11 +516,9 @@
                 addExplanationToChat(joke.explanation, jokeContainer, index);
             }
         });
+        scrollChatToBottom();
 
-        // 初始化完成后滚动到底部
-        scrollToBottom();
     }
-    window.addEventListener('load', scrollToBottom);
     init();
 </script>
 </body>
