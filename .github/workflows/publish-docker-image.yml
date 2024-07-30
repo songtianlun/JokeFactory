@@ -60,9 +60,7 @@ jobs:
         with:
           context: .
           push: ${{ github.event_name != 'pull_request' }}
-          tags: |
-            ${{ steps.meta.outputs.tags }}-${{ steps.time.outputs.time }}
-            ${{ steps.meta.outputs.tags }}
+          tags: ${{ steps.meta.outputs.tags }}-${{ steps.time.outputs.time }}
           labels: ${{ steps.meta.outputs.labels }}
 #      - name: Build and push Docker image latest
 #        uses: docker/build-push-action@v2
