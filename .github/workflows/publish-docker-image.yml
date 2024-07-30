@@ -62,7 +62,7 @@ jobs:
           push: ${{ github.event_name != 'pull_request' }}
           tags: |
             ${{ steps.meta.outputs.tags }}-${{ steps.time.outputs.time }}
-            ${{ secrets.DOCKERHUB_USERNAME }}/${{ github.repository }}:latest
+            ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
 #      - name: Build and push Docker image latest
 #        uses: docker/build-push-action@v2
